@@ -1,26 +1,42 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import ApolloClient from "apollo-boost";
+import Amplify, { Auth } from "aws-amplify";
+import awsExports from "./aws-exports";
+import { ApolloProvider } from "@apollo/react-hooks";
+import { BlogListContainer } from "./Blog";
+import { withAuthenticator } from "@aws-amplify/ui-react";
+Amplify.configure(awsExports);
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const App = () => {
+  const clientRef = React.useRef<ApolloClient<any>>();
+  const [clientInitialised, setClientInitialised] = React.useState(false);
+  React.useEffect(() => {
+    Auth.currentSession().then(s => {
+      clientRef.current = new ApolloClient({
+        uri: awsExports.aws_appsync_graphqlEndpoint,
+        headers: {
+          Authorization: s.getAccessToken().getJwtToken()
+        }
+      });
+      setClientInitialised(true);
+    });
+  }, []);
+  if(clientInitialised) {
+    return (
+      <ApolloProvider client={clientRef.current!}>
+        <div className="App">
+          <header className="App-header">
+            Whatevs application - whatever
+          </header>
+          <main>
+            <BlogListContainer />
+          </main>
+        </div>
+      </ApolloProvider>
+    );
+  }
+  return null;
 }
 
-export default App;
+export default withAuthenticator(App);
