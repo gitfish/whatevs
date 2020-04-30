@@ -1,2 +1,2 @@
 # whatevs
-Mucking around with amplify etc
+Mucking around with amplify, apollo, react etc

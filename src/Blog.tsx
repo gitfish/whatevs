@@ -1,6 +1,5 @@
 import React from "react";
-import { useQuery } from "@apollo/react-hooks";
-import { gql } from 'apollo-boost';
+import { useQuery, gql } from "@apollo/client";
 import { listBlogs } from "./graphql/queries";
 import { ListBlogsQuery } from "./API";
 
